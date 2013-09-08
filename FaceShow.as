@@ -7,16 +7,21 @@ package {
 		private var cam:Camera = null;
 		private var vid:Video = null;
 		private const RESIZE_BORDER_WIDTH:int = 20;
+		private var cameraIndex:int = 0;
 		public function FaceShow() {
-			trace("Alive");
 			this.stage.scaleMode = StageScaleMode.NO_SCALE;
 			this.stage.align = StageAlign.TOP_LEFT;
 			this.graphics.drawRect(0, 0, 320, 240);
 			this.stage.addEventListener(MouseEvent.MOUSE_DOWN, mouseDownHandler);
+			this.stage.addEventListener(Event.RESIZE, resizeHandler);
 			this.stage.nativeWindow.alwaysInFront = true;
 			initCamera();
 		}
 		protected function mouseDownHandler(e:MouseEvent):void {
+			if (!e.buttonDown) {
+				switchToNextCamera();
+				return;
+			}
 			var rightSide:Boolean = e.stageX > stage.stageWidth - RESIZE_BORDER_WIDTH;
 			var leftSide:Boolean = e.stageX < RESIZE_BORDER_WIDTH && !rightSide;
 			var bottomSide:Boolean = e.stageY > stage.stageHeight - RESIZE_BORDER_WIDTH;
@@ -33,7 +38,7 @@ package {
 			}
 		}
 		protected function initCamera():void {
-			cam = Camera.getCamera();
+			cam = Camera.getCamera(Camera.names[cameraIndex]);
 			if (cam == null) {
 				trace("WTF - camera is null, this machine has no camera");
 				return;
@@ -48,6 +53,16 @@ package {
 			cam.setMode(stage.stageWidth, stage.stageHeight, 30);
 			vid.width = stage.stageWidth;
 			vid.height = stage.stageHeight;
+		}
+		protected function switchToNextCamera():void {
+			cameraIndex = (cameraIndex + 1) % Camera.names.length;
+			cam = Camera.getCamera(Camera.names[cameraIndex]);
+			if (cam == null) {
+				trace("WTF - camera is null, this machine has no camera");
+				return;
+			}
+			cam.setMode(stage.stageWidth, stage.stageHeight, 30);
+			vid.attachCamera(cam);
 		}
 	}
 
