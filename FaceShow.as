@@ -14,14 +14,11 @@ package {
 			this.graphics.drawRect(0, 0, 320, 240);
 			this.stage.addEventListener(MouseEvent.MOUSE_DOWN, mouseDownHandler);
 			this.stage.addEventListener(Event.RESIZE, resizeHandler);
+			this.stage.addEventListener(MouseEvent.RIGHT_CLICK, rightClickHandler);
 			this.stage.nativeWindow.alwaysInFront = true;
 			initCamera();
 		}
 		protected function mouseDownHandler(e:MouseEvent):void {
-			if (!e.buttonDown) {
-				switchToNextCamera();
-				return;
-			}
 			var rightSide:Boolean = e.stageX > stage.stageWidth - RESIZE_BORDER_WIDTH;
 			var leftSide:Boolean = e.stageX < RESIZE_BORDER_WIDTH && !rightSide;
 			var bottomSide:Boolean = e.stageY > stage.stageHeight - RESIZE_BORDER_WIDTH;
@@ -49,13 +46,16 @@ package {
 			addChild(vid);
 		}
 		protected function resizeHandler(e:Event):void {
-			if (cam == null) return;
-			cam.setMode(stage.stageWidth, stage.stageHeight, 30);
-			vid.width = stage.stageWidth;
-			vid.height = stage.stageHeight;
+			//if (cam == null) return;
+			//removeChild(vid);
+			//initCamera();
+		}
+		protected function rightClickHandler(e:MouseEvent):void {
+			switchToNextCamera();
 		}
 		protected function switchToNextCamera():void {
 			cameraIndex = (cameraIndex + 1) % Camera.names.length;
+			trace("switch to cam " + cameraIndex.toString());
 			cam = Camera.getCamera(Camera.names[cameraIndex]);
 			if (cam == null) {
 				trace("WTF - camera is null, this machine has no camera");
